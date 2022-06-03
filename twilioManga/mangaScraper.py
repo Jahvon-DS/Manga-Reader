@@ -4,6 +4,7 @@ from base64 import decode
 from email import message
 from http import client
 from requests import request
+import requests
 from twilio.rest import Client
 from twilio.twiml.messaging_response import MessagingResponse
 import urllib3
@@ -11,7 +12,7 @@ import keys
 from bs4 import BeautifulSoup 
 from urllib.request import urlopen, Request
 from flask import *
-import re 
+import requests
 import codecs
 
 app = Flask("MangaScraper")
@@ -28,60 +29,43 @@ def manga():
 
 
 
- url = "https://readmangafull.com" + requestManga.replace(" ", "-")
-
-  #to account for white space in search we use replace
+ url = "https://readmangafull.com/" + requestManga.replace(" ", "-").replace("&", "/").lower() + "/all-pages"
+ print(url)
  
-  
- 
-
- resp= MessagingResponse()
- if requestManga == 'POST': 
-       
-        resp.message("What Chapter?") 
-        mangaChapter = request.values.get('Body', ' ')
-
+ head = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'} 
+ PARAMS = {'header':head}
+ #UserAgent = Request("https://read-manga.org/black-clover/chapter-331/all-pages","GET")
+ UserAgent= requests.get(url,PARAMS).json()
     
-
-#mangaChapter = input("What Chapter?: ")
-        url_mangaChapter = str(url + "/chapter-" + str(mangaChapter) + "/all-pages")
-     
-        '''Error Here for 'str' object has no attribute 'get' '''
-     
-        head = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'} 
-        PARAMS = {'header':head}
-        #UserAgent = Request("https://read-manga.org/black-clover/chapter-331/all-pages","GET")
-        UserAgent= Request(url_mangaChapter,PARAMS)
-    
-     
-    
-     #UserAgent= Request(url_mangaChapter,headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'})
-        page = urlopen(UserAgent)
-        html = page.read().decode("utf-8")
-        soup = BeautifulSoup(html, "html.parser")
+#UserAgent= Request(url_mangaChapter,headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'})
+ page = urlopen(UserAgent)
+ html = page.read().decode("utf-8")
+ soup = BeautifulSoup(html, "html.parser")
 
 #specifying which type of images to take
-        images = soup.select('img[src ^="https://readm.org//uploads/chapter_files/"]')
-        client = Client(keys.account_sid,keys.auth_token)
-        '''     
-        for i in images:
-         global pages 
-         pages = [] 
-        # print( client.messages.create(body = 'This is a page from manga', media_url= i ['src'], from_ = keys.twilio_number, to = keys.my_phone_number ))
-         return pages.append(i['src'])
+ images = soup.select('img[src ^="https://readm.org//uploads/chapter_files/"]')
+ client = Client(keys.account_sid,keys.auth_token)
+ 
+ resp= MessagingResponse()
+ msg = resp.message()
+ r = {}
+
+ '''     
+for i in images:
+  global pages 
+  pages = [] 
+# print( client.messages.create(body = 'This is a page from manga', media_url= i ['src'], from_ = keys.twilio_number, to = keys.my_phone_number ))
+return pages.append(i['src'])
 
        ''' 
         
-        for i in images: 
-          
-         print( client.messages.create(body = 'This is a page from manga', media_url= i ['src'], from_ = keys.twilio_number, to = keys.my_phone_number ))
-
- else: 
-  return str()            
-     
-
-       
+ for i in images: 
+  r += ( client.messages.create(body = 'This is a page from manga', media_url= i ['src'], from_ = keys.twilio_number, to = keys.my_phone_number ))
  
+ msg.media_url(r)
+
+ return str(resp)
+
 app.run()
 
 
@@ -157,7 +141,5 @@ def manga():
     def pages():
       for i in images: 
         print(i['src'])
-  return pages
-
-
+    return pages
 '''
