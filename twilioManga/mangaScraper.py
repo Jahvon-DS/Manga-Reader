@@ -30,14 +30,15 @@ def manga():
 
 
  url = "https://readmangafull.com/" + requestManga.replace(" ", "-").replace("&", "/").lower() + "/all-pages"
- print(url)
- 
+ #print(url)
+
  head = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'} 
- PARAMS = {'header':head}
- #UserAgent = Request("https://read-manga.org/black-clover/chapter-331/all-pages","GET")
- UserAgent= requests.get(url,PARAMS).json()
+ #PARAMS = {'headers':head}
+ #UserAgent = Request("https://read-manga.org/black-clover/chapter-331/all-pages",headers=head)
+ UserAgent= requests(url,headers=head)
+ 
     
-#UserAgent= Request(url_mangaChapter,headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'})
+ #UserAgent= Request(url,headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'})
  page = urlopen(UserAgent)
  html = page.read().decode("utf-8")
  soup = BeautifulSoup(html, "html.parser")
@@ -48,7 +49,7 @@ def manga():
  
  resp= MessagingResponse()
  msg = resp.message()
- r = {}
+ 
 
  '''     
 for i in images:
@@ -60,9 +61,9 @@ return pages.append(i['src'])
        ''' 
         
  for i in images: 
-  r += ( client.messages.create(body = 'This is a page from manga', media_url= i ['src'], from_ = keys.twilio_number, to = keys.my_phone_number ))
+  resp.message( client.messages.create(body = 'This is a page from manga', media_url= i ['src'], from_ = keys.twilio_number, to = keys.my_phone_number ))
  
- msg.media_url(r)
+ 
 
  return str(resp)
 
