@@ -49,7 +49,7 @@ def manga():
  
  resp= MessagingResponse()
  msg = resp.message()
- pages = {}
+ 
 
  '''     
 for i in images:
