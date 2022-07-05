@@ -1,6 +1,4 @@
-from asyncio.windows_events import NULL
 from base64 import decode
-#from crypt import methods
 from email import message
 from http import client
 from requests import request
@@ -16,33 +14,32 @@ import requests
 import codecs
 
 app = Flask("MangaScraper")
-
-
-
+ 
+ 
+ 
 @app.route("/manga", methods=["POST", "GET"])
 def manga():
-
+ 
  requestManga = request.values.get('Body', '')
-  
-  
+ 
+ 
 # requestManga = input("Please Enter Manga:")
-
-
-
+ 
+ 
+ 
  url = "https://readmangafull.com/" + requestManga.replace(" ", "-").replace("&", "/").lower() + "/all-pages"
  #print(url)
-
- head = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'} 
+ 
+ head = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'}
  #PARAMS = {'headers':head}
  #UserAgent = Request("https://read-manga.org/black-clover/chapter-331/all-pages",headers=head)
- UserAgent= requests(url,headers=head)
+ #UserAgent= Request(url,headers=head)
  
-    
- #UserAgent= Request(url,headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'})
- page = urlopen(UserAgent)
- html = page.read().decode("utf-8")
- soup = BeautifulSoup(html, "html.parser")
-
+   
+ UserAgent= requests.request("GET",url,headers=head)
+ #page = urlopen(UserAgent)
+ soup = BeautifulSoup(UserAgent.text, "html.parser")
+ 
 #specifying which type of images to take
  images = soup.select('img[src ^="https://readm.org//uploads/chapter_files/"]')
  client = Client(keys.account_sid,keys.auth_token)
@@ -50,23 +47,23 @@ def manga():
  resp= MessagingResponse()
  msg = resp.message()
  
-
- '''     
+ 
+ '''    
 for i in images:
-  global pages 
-  pages = [] 
+  global pages
+  pages = []
 # print( client.messages.create(body = 'This is a page from manga', media_url= i ['src'], from_ = keys.twilio_number, to = keys.my_phone_number ))
 return pages.append(i['src'])
-
-       ''' 
-        
- for i in images: 
+ 
+       '''
+       
+ for i in images:
   resp.message( client.messages.create(body = 'This is a page from manga', media_url= i ['src'], from_ = keys.twilio_number, to = keys.my_phone_number ))
  
  
-
+ 
  return str(resp)
-
+ 
 app.run()
 
 
