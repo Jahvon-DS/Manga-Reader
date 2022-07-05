@@ -15,6 +15,7 @@ app = Flask("MangaScraper")
  
 @app.route("/manga", methods=["POST", "GET"])
 def manga():
+<<<<<<< HEAD
  
  requestManga = request.values.get('Body', '') 
  #recvieving input from the user
@@ -29,6 +30,30 @@ def manga():
  
  soup = BeautifulSoup(UserAgent.text, "html.parser")
  
+=======
+
+ requestManga = request.values.get('Body', '')
+  
+  
+# requestManga = input("Please Enter Manga:")
+
+
+
+ url = "https://readmangafull.com/" + requestManga.replace(" ", "-").replace("&", "/").lower() + "/all-pages"
+ #print(url)
+
+ head = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'} 
+ #PARAMS = {'headers':head}
+ #UserAgent = Request("https://read-manga.org/black-clover/chapter-331/all-pages",headers=head)
+ UserAgent= requests(url,headers=head)
+ 
+    
+ #UserAgent= Request(url,headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'})
+ page = urlopen(UserAgent)
+ html = page.read().decode("utf-8")
+ soup = BeautifulSoup(html, "html.parser")
+
+>>>>>>> fd17d768f02b6ab11a0cadab959728aa3c065c6a
 #specifying which type of images to take
  images = soup.select('img[src ^="https://readm.org//uploads/chapter_files/"]')
 
@@ -36,6 +61,10 @@ def manga():
  
  resp= MessagingResponse()
  msg = resp.message()
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> fd17d768f02b6ab11a0cadab959728aa3c065c6a
 
 
  
@@ -46,14 +75,102 @@ for i in images:
   pages = []
 # print( client.messages.create(body = 'This is a page from manga', media_url= i ['src'], from_ = keys.twilio_number, to = keys.my_phone_number ))
 return pages.append(i['src'])
+<<<<<<< HEAD
  
        '''
        
  for i in images:
   resp.message( client.messages.create(body = 'This is a page from manga', media_url= i ['src'], from_ = keys.twilio_number, to = keys.my_phone_number ))
  
+=======
+
+       ''' 
+        
+ for i in images: 
+  resp.message( client.messages.create(body = 'This is a page from manga', media_url= i ['src'], from_ = keys.twilio_number, to = keys.my_phone_number ))
+ 
+ 
+
+>>>>>>> fd17d768f02b6ab11a0cadab959728aa3c065c6a
  return str(resp)
  
 app.run()
 
 
+<<<<<<< HEAD
+=======
+'''
+#making request via twilio 
+client = Client(keys.account_sid,keys.auth_token)
+
+#sending the images to twilio phone number
+for i in images: 
+   print( client.messages.create(body = 'This is a page from manga', media_url= i ['src'], from_ = keys.twilio_number, to = keys.my_phone_number ))
+
+'''
+
+
+
+
+'''
+mangaName = input(client.messages.create( 
+    body= 'This is a page from manga:',
+    media_url= [url_mangaChapter['src']],
+    from_ = keys.twilio_number,
+    to =keys.my_phone_number
+))
+
+## printing this to the device --> will need to iterate
+
+'''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
+app = Flask("MangaScraper")
+
+
+
+@app.route("/manga", methods=["POST", "GET"])
+def manga():
+  if request.method == 'POST': 
+    mangaName = urllib3.parse.quote(request.form['Body'])
+    url = "https://readmangafull.com" + mangaName.replace(" ", "-")
+
+    MessagingResponse().message("What Chapter?")
+    mangaChapter = request.values.get('Body', '')
+
+    url_mangaChapter = str(url + "/chapter-" + str(mangaChapter) + "/all-pages")
+
+    head = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'} 
+    PARAMS = {'header':head}
+    UserAgent= Request(url_mangaChapter,PARAMS)
+     
+    
+     #UserAgent= Request(url_mangaChapter,headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36'})
+    page = urlopen(UserAgent)
+    html = page.read().decode("utf-8")
+    soup = BeautifulSoup(html, "html.parser")
+
+#specifying which type of images to take
+    images = soup.select('img[src ^="https://readm.org//uploads/chapter_files/"]')
+
+    def pages():
+      for i in images: 
+        print(i['src'])
+    return pages
+'''
+>>>>>>> fd17d768f02b6ab11a0cadab959728aa3c065c6a
