@@ -56,4 +56,3 @@ return pages.append(i['src'])
  
 app.run()
 
-#find the most recent released chapter
